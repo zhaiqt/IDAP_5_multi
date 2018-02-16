@@ -1,0 +1,8 @@
+*.pyc
+/rawdata
+/result
+/results
+/data
+.DS_Store
+*.swp
+*.csv
