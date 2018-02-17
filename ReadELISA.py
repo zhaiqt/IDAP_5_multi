@@ -20,29 +20,7 @@ def initiate_new_plate():
 #read_envision_384_csv('./rawdata/ensingle.csv')
 #read_384_csv('Plate2.csv')
 
-######## parse_384row###
-def parse_384row(rowlist):
-    newlist=[]
-    # ignore line 1 2 3 4 5 ... 12
-    if '123456789101112' in ''.join(rowlist):
-        return []
-    tmp_row = [ ele for ele in rowlist if ele ] # select all non empty elements from rowlist
-    for i in range(len(tmp_row)):
-        try:
-            score = float(tmp_row[i])
-        except:
-            continue
-        newlist.append(score)
-    if len(newlist)== 24:
-        return newlist
-    elif len(newlist) == 25:
-        newlist.pop(0)
-        return newlist
-    else:
-        # logging.error("The following line is not raw data line")
-        # logging.error(rowlist)
-        # logging.error(newlist)
-        return []
+
 
 
 ########  Read dry 384 only ###########
@@ -95,24 +73,30 @@ def read_EnVision_384_csv(inFile):
             elif 'Barcode' in row:
                 findBarcode = True
                 barcode_pos = row.index('Barcode')
-            elif len(row) >= 24: # find the real data
-                row = parse_384row(row)
-                rowcount += 1
-                plate96_listA,plate96_listB,plate96_listC,plate96_listD = convert_384row_4list(row,rowcount,plate96_listA,plate96_listB,plate96_listC,plate96_listD)
+
+            else:
+                row=trim_data_line(row)
+
+                if len(row) ==  24:
+
+                    rowcount +=1
+                    plate96_listA,plate96_listB,plate96_listC,plate96_listD = convert_384row_4list(row,rowcount,plate96_listA,plate96_listB,plate96_listC,plate96_listD)
 
     logging.debug(elisa384PlateCount)
     if elisa384PlateCount > 0 :
         single384Dict[barcode_name]=combine_4list_dic(plate96_listA,plate96_listB,plate96_listC, plate96_listD )
     else:
         logging.debug("Warning! No ELISA data was found!")
+
     '''
     for key in single384Dict:
-        print key
-        print single384Dict[barcode_name][0]
-        print single384Dict[barcode_name][1]
-        print single384Dict[barcode_name][2]
-        print single384Dict[barcode_name][3]
-    print single384Dict
+        #print key
+        print single384Dict[key][0]
+        print single384Dict[key][1]
+        print single384Dict[key][2]
+        print single384Dict[key][3]
+
+    #print single384Dict
     '''
     return single384Dict
 
@@ -140,11 +124,13 @@ def read_MD384_csv(inFile):
                 barcode_name = row[1]
                 elisa384PlateCount += 1
 
-            elif len(row) >=24: # find the real data
-                # print row
-                row = parse_384row(row)
-                rowcount +=1
-                plate96_listA,plate96_listB,plate96_listC,plate96_listD = convert_384row_4list(row,rowcount,plate96_listA,plate96_listB,plate96_listC,plate96_listD)
+            else:
+                row=trim_data_line(row)
+
+                if len(row) ==  24:
+
+                    rowcount +=1
+                    plate96_listA,plate96_listB,plate96_listC,plate96_listD = convert_384row_4list(row,rowcount,plate96_listA,plate96_listB,plate96_listC,plate96_listD)
 
         logging.debug(elisa384PlateCount)
         if elisa384PlateCount > 0 :
@@ -188,10 +174,11 @@ def read_PHERAstar_384_csv(inFile):
                     barcode_name= temp[0]
                     print barcode_name
 
-            elif len(row) >=24: # find the real data
-                row = parse_384row(row)
-                rowcount +=1
-                plate96_listA,plate96_listB,plate96_listC,plate96_listD = convert_384row_4list(row,rowcount,plate96_listA,plate96_listB,plate96_listC,plate96_listD)
+            else:
+                row=trim_data_line(row)
+                if len(row) ==  24:
+                    rowcount +=1
+                    plate96_listA,plate96_listB,plate96_listC,plate96_listD = convert_384row_4list(row,rowcount,plate96_listA,plate96_listB,plate96_listC,plate96_listD)
 
 
         logging.debug(elisa384PlateCount)
@@ -256,17 +243,34 @@ def combine_csv_dir(infilePath,outfilePath):
 
 
 ##########
-'''
-def check_data_line(indict):
+
+def trim_data_line(indict):
+    trim_list=[]
     if len(indict) < 23:
-        return False
+        return trim_list
+
     count_continue_dot=0
     for item in indict:
-        if '.' in item:
-            count_continue_dot +=0
-    return
-'''
+        if is_float(item):
+            count_continue_dot +=1
+            trim_list.append(float(item))
+        elif item.isalpha():
+            count_continue_dot=0
+            trim_list=[]
 
+    if len(trim_list) == 25:
+        trim_list.pop(0)
+
+    #print trim_list
+    print len(trim_list)
+    return trim_list
+
+######
+def is_float(string):
+    try:
+        return float(string) and '.' in string
+    except:
+        return False
 
 #######
 def print_dict(inputdict):
@@ -311,7 +315,7 @@ def identify_detector_type (inputfile):
 
 
 #################### Main ###########################
-a= combine_csv_dir('./rawdata/ensingle.csv', './rawdata/') #read_MD384_csv('./rawdata/MD.csv')
+#a= combine_csv_dir('./rawdata/ensingle.csv', './result/') #read_MD384_csv('./rawdata/MD.csv')
 
 #a= combine_csv_dir('/Users/zhaiqi1/Documents/Novartis/my_code/ToolBox/IDAP384screen/IDAP_5_multi/rawdata/TIM1_group62', '/Users/zhaiqi1/Documents/Novartis/my_code/ToolBox/IDAP384screen/IDAP_5_multi/result/')
 #a= read_PHERAstar_384_csv('/Users/zhaiqi1/Documents/Novartis/my_code/ToolBox/IDAP384screen/IDAP_5_multi/rawdata/DES23.csv')
