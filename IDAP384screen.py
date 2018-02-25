@@ -11,14 +11,15 @@ import logging
 #######################
 #python IDAP384screen.py -i /Users/zhaiqi1/Documents/Novartis/my_code/ToolBox/IDAP384screen/IDAP_5_star/rawdata/ensingle.csv.zip -c /Users/zhaiqi1/Documents/Novartis/my_code/ToolBox/IDAP384screen/IDAP_5_star/rawdata/barcode_Table.csv -o /Users/zhaiqi1/Documents/Novartis/my_code/ToolBox/IDAP384screen/IDAP_5_star/result
 parser = argparse.ArgumentParser( prog='CherryPicking',description="ELISA plate cheery picking", epilog='python CherryPick384.py -i inputfile.txt -d detector_type -c barcodefile.txt -s threshold -a samplePos -b backgroundPos -r ratio_threshold -o outputpath')
-parser.add_argument('-c','--barcode', help="Input bacode table file .txt", default ="/Users/zhaiqi1/Documents/Novartis/my_code/ToolBox/IDAP384screen/IDAP_5_multi/rawdata/barcode_Table.csv")
-parser.add_argument ('-i','--inputpath',help='Input directory', default="/Users/zhaiqi1/Documents/Novartis/my_code/ToolBox/IDAP384screen/IDAP_5_multi/rawdata/ensingle.csv")
+parser.add_argument('-c','--barcode', help="Input bacode table file .txt", default ="/Users/zhaiqi1/Documents/Novartis/my_code/ToolBox/IDAP384screen/IDAP_5_multi/rawdata/group62.csv")
+parser.add_argument ('-i','--inputpath',help='Input directory', default="/Users/zhaiqi1/Documents/Novartis/my_code/ToolBox/IDAP384screen/IDAP_5_multi/rawdata/TIM1_group62.zip")
 #parser.add_argument ('-d','--detector', help ='Reader type: MolecularDevice or EnVision or PHERAstar', type = str, default ='MolecularDevice')
 parser.add_argument('-s','--threshold', help="the cutof for the elisa", type= float,  default= '0.6')
 parser.add_argument('-r','--ratio_threshold', help="the ratio for the elisa", type=float, default='3')
-parser.add_argument('-b','--backgroundPos', help='1 or 2 or 3 or 4', type=int, default='1')
+parser.add_argument('-b','--backgroundPos', help='1 or 2 or 3 or 4', type=int, default='4')
 parser.add_argument('-a','--samplePos', help='1 or 2 or 3 or 4', type=int, default='2')
 parser.add_argument('-o', '--outputpath',help='outputpath for output',default='/Users/zhaiqi1/Documents/Novartis/my_code/ToolBox/IDAP384screen/IDAP_5_multi/result')
+parser.add_argument('-d', '--scriptr',help='only for scriptr',)
 parser.print_help()
 args=parser.parse_args()
 print args
@@ -29,7 +30,7 @@ logging.basicConfig(filename=log_file, level=log_level, format='%(asctime)s %(me
 
 raw384dir=ReadELISA.combine_csv_dir(args.inputpath, args.outputpath)
 print "^^^^^^^"
-#print raw384dir
+print len(raw384dir)
 
 
 BarcodeDir,Number96per384 = ReadBarcode.read_barcode_table (args.barcode)  # read barcode table

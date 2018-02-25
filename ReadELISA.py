@@ -245,8 +245,11 @@ def combine_csv_dir(infilePath,outfilePath):
 ##########
 
 def trim_data_line(indict):
+    print indict
     trim_list=[]
     if len(indict) < 23:
+        return trim_list
+    elif '123456789' in ''.join(indict):
         return trim_list
 
     count_continue_dot=0
@@ -261,6 +264,9 @@ def trim_data_line(indict):
     if len(trim_list) == 25:
         trim_list.pop(0)
 
+
+
+
     #print trim_list
     print len(trim_list)
     return trim_list
@@ -268,7 +274,7 @@ def trim_data_line(indict):
 ######
 def is_float(string):
     try:
-        return float(string) and '.' in string
+        return float(string)
     except:
         return False
 
